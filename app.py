@@ -20,8 +20,11 @@ observer_global = None
 
 app = Flask(__name__)
 REPO_PATH = "/home/didin/Project/TA/config/tftp"
-def head_commit(repo_path):
+
+def head_commit(repo_name):
+    repo_path = repos[repo_name]['path']
     commit = Repo(repo_path).head.commit
+    commit = Repo(repo_path).git.rev_parse(commit,short=7)
     # print(commit)
     return commit
 
@@ -86,7 +89,7 @@ class ApplicationRepo():
         return branch_split
 
     def get_hash_branches(self):
-        show_ref = self.repo.git.show_ref(hash=8)
+        show_ref = self.repo.git.show_ref(hash=7)
         show_ref = show_ref.split('\n')
         return show_ref
 
@@ -124,12 +127,7 @@ class EventHandler(PatternMatchingEventHandler):
     def on_any_event(self, event):
         eventType = ["deleted", "modified"]
         global flag_checkout
-        
-        # print("flag observer")
-        # print("head --> ", check_latest_commit())
-        # print("flag -->", flag_checkout)
-        # # Repo object used to programmatically interact with Git repositories
-        # repo = Repo(REPO_PATH)
+    
         if event.event_type in eventType:
             pathSplit = event.src_path.split("/")
             if len(pathSplit) > 4:
@@ -139,12 +137,17 @@ class EventHandler(PatternMatchingEventHandler):
                     print(pathSplit)
                     print(len(pathSplit))
                     print(self.repo_name)
-                    # path_to_commit = pathSplit[len(pathSplit)-2]+"/"+pathSplit[len(pathSplit)-1]
-                    # path_repo_device = pathSplit[len(pathSplit)-2]
-                    # repo = Repo(os.path.join(REPO_PATH,self.repo_name))
-                    repo = Repo(repos[self.repo_name]['path'])
-                    self.push_repository(repo)
-                    # print(COUNTER)
+                    self.update_branch()
+                    if self.check_repo(self.repo_name):
+                        self.checkout_to_branch(self.repo_name)
+                        repo = Repo(repos[self.repo_name]['path'])
+                        self.push_repository(repo)
+                    else:
+                        self.create_branch()
+                        repo = Repo(repos[self.repo_name]['path'])
+                        self.push_repository(repo)
+
+                    
 
         flag_checkout = True
 
@@ -164,6 +167,34 @@ class EventHandler(PatternMatchingEventHandler):
             print("Push completed")
 
         print("push function are called")
+
+    def check_repo(self,repo_name):
+        head = head_commit(repo_name)
+        if head in initialAttributes[repo_name]['hash_branches']:
+            return True
+        else:
+            return False
+
+    def create_branch(self):
+        g = Repo(repos[self.repo_name]['path']).git
+        num = str(len(initialAttributes[self.repo_name]['branches']))
+        new_branch = num+'branch'
+        initialAttributes[self.repo_name]['branches'].append(new_branch)
+        g.checkout(b=new_branch)
+
+    def checkout_to_branch(self,repo_name):
+        g = Git(repos[self.repo_name]['path'])
+        branch_index = initialAttributes[repo_name]['hash_branches'].index(head_commit(repo_name))
+        branch = initialAttributes[repo_name]['branches'][branch_index]
+        g.checkout(branch)
+
+    def update_branch(self):
+        x = ApplicationRepo(repos[self.repo_name]['path'], self.repo_name)
+        initialAttributes[self.repo_name]['branches']=x.get_branches()
+        initialAttributes[self.repo_name]['hash_branches']=x.get_hash_branches()
+
+
+
 
 @app.route("/")
 def hello():
@@ -226,7 +257,7 @@ def create_directory(protocol, name):
                     # path_observer = os.path.join(REPO_PATH,name)
                     x = observerThread(path, name)
                     x.start()
-                    observer.append(x)
+                    observer[name]=x
                 print(repos)
             except OSError as err:  
                 print ("Creation of the directory %s failed" % path)
@@ -256,9 +287,9 @@ def list_directory(protocol):
 def checkout_commit(repo,commit):
     # global flag_checkout
     # flag_checkout = False
-    x = observer[repos.index(repo)]
+    x = observer[repo]
     x.pause_thread()
-    repo_path = os.path.join(REPO_PATH,repo) 
+    repo_path = repos[repo]['path'] 
     g = Git(repo_path)
     g.checkout(commit)
     x.cont_thread()
@@ -289,10 +320,22 @@ def graph(repoName):
     graph = repo.git.log(all=True, oneline=True, graph=True)
     return graph
 
+@app.route('/pause/<repo_name>')
+def pause(repo_name):
+    repoObserver = observer[repo_name]
+    repoObserver.pause_thread()
+    return repo_name+' is paused'
+
+@app.route('/cont/<repo_name>')
+def cont(repo_name):
+    repoObserver = observer[repo_name]
+    repoObserver.cont_thread()
+    return repo_name+' is continued'
+
 if __name__ == '__main__':
     initialAttributes = collections.defaultdict(dict)
     repos = collections.defaultdict(dict)
-    observer = []
+    observer = collections.defaultdict(dict)
     path_tftp = "./config/tftp"
     path_ftp = "./config/ftp"
     for x in os.listdir(path_tftp):
@@ -301,9 +344,9 @@ if __name__ == '__main__':
             # repos.append(x)
             repos[x]['path']=os.path.join(path_tftp,x)
             print(x)
-            x = observerThread(path_observer, x)
-            x.start()
-            observer.append(x)
+            repo_observer = observerThread(path_observer, x)
+            repo_observer.start()
+            observer[x]=repo_observer
 
     for x in os.listdir(path_ftp):
         if os.path.isdir(os.path.join(path_ftp,x)):
@@ -313,9 +356,9 @@ if __name__ == '__main__':
                 repos[x]['path']=os.path.join(path_ftp,x)
                 
                 print(x)
-                x = observerThread(path_observer, x)
-                x.start()
-                observer.append(x)
+                repo_observer = observerThread(path_observer, x)
+                repo_observer.start()
+                observer[x]=repo_observer
 
     for a in repos:
         x = ApplicationRepo(repos[a]['path'], a)
