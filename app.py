@@ -10,6 +10,7 @@ from watchdog.events import FileSystemEventHandler
 from watchdog.events import PatternMatchingEventHandler
 
 import threading
+import subprocess
 
 from git import Repo, Git
 from flask import Flask,jsonify, request, redirect, render_template, url_for
@@ -137,7 +138,6 @@ class EventHandler(PatternMatchingEventHandler):
                     print(pathSplit)
                     print(len(pathSplit))
                     print(self.repo_name)
-                    self.update_branch()
                     if self.check_repo(self.repo_name):
                         self.checkout_to_branch(self.repo_name)
                         repo = Repo(repos[self.repo_name]['path'])
@@ -146,6 +146,9 @@ class EventHandler(PatternMatchingEventHandler):
                         self.create_branch()
                         repo = Repo(repos[self.repo_name]['path'])
                         self.push_repository(repo)
+
+                    self.update_branch()
+                    print("{}-->{}".format(self.repo_name,initialAttributes[self.repo_name]))
 
                     
 
@@ -178,7 +181,7 @@ class EventHandler(PatternMatchingEventHandler):
     def create_branch(self):
         g = Repo(repos[self.repo_name]['path']).git
         num = str(len(initialAttributes[self.repo_name]['branches']))
-        new_branch = num+'branch'
+        new_branch = num+'-branch'
         initialAttributes[self.repo_name]['branches'].append(new_branch)
         g.checkout(b=new_branch)
 
@@ -258,6 +261,10 @@ def create_directory(protocol, name):
                     x = observerThread(path, name)
                     x.start()
                     observer[name]=x
+                    repoClass = ApplicationRepo(repos[name]['path'], name)
+                    initialAttributes[name]['branches']=repoClass.get_branches()
+                    initialAttributes[name]['hash_branches']=repoClass.get_hash_branches()
+
                 print(repos)
             except OSError as err:  
                 print ("Creation of the directory %s failed" % path)
@@ -320,17 +327,13 @@ def graph(repoName):
     graph = repo.git.log(all=True, oneline=True, graph=True)
     return graph
 
-@app.route('/pause/<repo_name>')
-def pause(repo_name):
-    repoObserver = observer[repo_name]
-    repoObserver.pause_thread()
-    return repo_name+' is paused'
-
-@app.route('/cont/<repo_name>')
-def cont(repo_name):
-    repoObserver = observer[repo_name]
-    repoObserver.cont_thread()
-    return repo_name+' is continued'
+@app.route('/tree/<repo_name>')
+def tree(repo_name):
+    # cmd = ['git', '--git-dir']
+    # cmd_back = ['log', '--oneline']
+    repo = Repo(repos[repo_name]['path'])
+    log = repo.git.log(all=True, oneline=True, graph=True)
+    return log
 
 if __name__ == '__main__':
     initialAttributes = collections.defaultdict(dict)
