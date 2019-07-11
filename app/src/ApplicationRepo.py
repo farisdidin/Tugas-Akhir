@@ -1,10 +1,15 @@
+import datetime
 from git import Repo, Git
 
 class ApplicationRepo():
     def __init__(self,repo_path,repo_name):
+        Repo.init(repo_path)
         self.repo = Repo(repo_path)
-        
+        self.repo_path = repo_path
         self.repoName = repo_name
+
+    # def init_repo(self):
+    #     Repo.init(self.repo_path)
 
     def get_branches(self):
         branch = self.repo.git.branch()
@@ -40,6 +45,30 @@ class ApplicationRepo():
         branch_index = self.get_hash_branches().index(self.get_head())
         branch = self.get_branches()[branch_index]
         g.checkout(branch)
+
+    def push(self):
+        try:
+            dateNow = datetime.datetime.now()
+            self.repo.git.add('.')
+            self.repo.index.commit(dateNow.strftime("%Y-%m-%d %H-%M-%S"))
+            # origin = repo.remote(name='origin')
+            # origin.push()
+            print(self.repo)
+            # print(path)
+        except Exception as e:
+            print("Error Occured")
+            print(e)
+        finally:
+            print("Push completed")
+
+        print("push function are called")
+
+    def create_branch(self):
+        g = self.repo.git
+        num = len(self.get_branches())
+        new_branch = num+'-branch'
+        # initialAttributes[self.repo_name]['branches'].append(new_branch)
+        g.checkout(b=new_branch)
 
     # def check_attribute_hash(self):
     #     global initialAttributes

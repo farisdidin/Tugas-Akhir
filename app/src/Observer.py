@@ -82,12 +82,11 @@ class EventHandler(PatternMatchingEventHandler):
                     print(self.repo_name)
                     if self.repository.check_repo():
                         self.repository.checkout_to_branch()
-                        # repo = Repo(repos[self.repo_name]['path'])
-                        self.push_repository(repo)
+                        self.repository.push()
                     else:
-                        self.create_branch()
-                        repo = Repo(repos[self.repo_name]['path'])
-                        self.push_repository(repo)
+                        self.repository.create_branch()
+                        self.repository.push()
+
 
                     # self.update_branch()
                     # print("{}-->{}".format(self.repo_name,initialAttributes[self.repo_name]))
@@ -96,22 +95,22 @@ class EventHandler(PatternMatchingEventHandler):
 
         flag_checkout = True
 
-    def push_repository(self,repo):
-        try:
-            dateNow = datetime.datetime.now()
-            repo.git.add('.')
-            repo.index.commit(dateNow.strftime("%Y-%m-%d %H-%M-%S"))
-            # origin = repo.remote(name='origin')
-            # origin.push()
-            print(repo)
-            # print(path)
-        except Exception as e:
-            print("Error Occured")
-            print(e)
-        finally:
-            print("Push completed")
+    # def push_repository(self,repo):
+    #     try:
+    #         dateNow = datetime.datetime.now()
+    #         repo.git.add('.')
+    #         repo.index.commit(dateNow.strftime("%Y-%m-%d %H-%M-%S"))
+    #         # origin = repo.remote(name='origin')
+    #         # origin.push()
+    #         print(repo)
+    #         # print(path)
+    #     except Exception as e:
+    #         print("Error Occured")
+    #         print(e)
+    #     finally:
+    #         print("Push completed")
 
-        print("push function are called")
+    #     print("push function are called")
 
     
     

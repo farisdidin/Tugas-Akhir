@@ -319,19 +319,12 @@ def check(repoName):
     print(initialAttributes[repoName])
     return jsonify(halo)
 
-@app.route('/graph/<repoName>')
-def graph(repoName):
-    path = "./config/tftp"
-    repo_path = os.path.join(path,repoName)
-    repo = Repo(repo_path)
-    graph = repo.git.log(all=True, oneline=True, graph=True)
-    return graph
 
-@app.route('/tree/<repo_name>')
-def tree(repo_name):
+@app.route('/graph/<repoName>')
+def tree(repoName):
     # cmd = ['git', '--git-dir']
     # cmd_back = ['log', '--oneline']
-    repo = Repo(repos[repo_name]['path'])
+    repo = Repo(repos[repoName]['path'])
     log = repo.git.log(all=True, oneline=True, graph=True)
     return log
 
