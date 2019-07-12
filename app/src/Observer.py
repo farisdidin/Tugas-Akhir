@@ -53,7 +53,7 @@ class PausingObserver(Observer):
         self._is_paused = True
 
     def resume(self):
-        time.sleep(5)  # allow interim events to be queued
+        time.sleep(2)  # allow interim events to be queued
         self.event_queue.queue.clear()
         self._is_paused = False
 

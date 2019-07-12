@@ -70,6 +70,13 @@ class ApplicationRepo():
         # initialAttributes[self.repo_name]['branches'].append(new_branch)
         g.checkout(b=new_branch)
 
+    def checkout(self, commit):
+        g = self.repo.git
+        g.checkout(commit)
+
+    def get_log(self):
+        g = self.repo.git
+        return g.log(all=True, oneline=True, graph=True)
     # def check_attribute_hash(self):
     #     global initialAttributes
     #     current = self.get_hash_branches()
