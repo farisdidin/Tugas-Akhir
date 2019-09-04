@@ -1,4 +1,5 @@
 import datetime
+import collections
 from git import Repo, Git
 
 class ApplicationRepo():
@@ -65,7 +66,7 @@ class ApplicationRepo():
 
     def create_branch(self):
         g = self.repo.git
-        num = len(self.get_branches())
+        num = str(len(self.get_branches()))
         new_branch = num+'-branch'
         # initialAttributes[self.repo_name]['branches'].append(new_branch)
         g.checkout(b=new_branch)
@@ -77,9 +78,20 @@ class ApplicationRepo():
     def get_log(self):
         g = self.repo.git
         return g.log(all=True, oneline=True, graph=True)
-    # def check_attribute_hash(self):
-    #     global initialAttributes
-    #     current = self.get_hash_branches()
-    #     for i,(a,b) in enumerate(zip(initialAttributes[self.repoName]['hash_branches'],current)):
-    #         if a != b:
-    #             initialAttributes[self.repoName]['hash_branches'][i]=b 
+
+    def get_list_commits(self):
+        branches = self.get_branches()
+        result = collections.defaultdict(dict)
+        for i in branches:
+            commits = list(self.repo.iter_commits(i))
+            print(i)
+            array_commits = []
+            for commit in reversed(commits):
+                short_sha = self.repo.git.rev_parse(commit.hexsha,short=6)
+                print(short_sha)
+                array_commits.append(short_sha)
+            result[i]=array_commits
+
+        return result
+
+    

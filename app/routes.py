@@ -53,7 +53,7 @@ def index(repo_name):
     repo_detail = collections.defaultdict(dict)
     for i in branch:
         repo_detail[i] = head_branch[branch.index(i)]
-        return jsonify(repo_detail)
+    return jsonify(repo_detail)
 
 
 @app.route('/create_repo/<protocol>/<name>')
@@ -61,25 +61,25 @@ def create_repo(protocol, name):
     if protocol == 'tftp' or protocol == 'ftp':
         if name not in repo_details:
             path = "./config/"+protocol+"/"+name
-            # try:
-            os.mkdir(path)
-            initiate_file = path+"/intial"
-            f = open(initiate_file,'w+')
-            f.close()
-            print("{} {}".format(name, path))
-            
-            rp = ap(path,name)
-            rp.push()
-            repo_details[name]['path']=path
-            thread = ot(path,name)
-            thread.start()
-            repo_details[name]['observer']=thread
-            print(repo_details)
-            print("DEBUG")
-            # except Exception as e:
-                # print(e)
-            # finally:
-                # print('Repository {} created'.format(name))
+            try:
+                os.mkdir(path)
+                initiate_file = path+"/intial"
+                f = open(initiate_file,'w+')
+                f.close()
+                print("{} {}".format(name, path))
+                
+                rp = ap(path,name)
+                rp.push()
+                repo_details[name]['path']=path
+                thread = ot(path,name)
+                thread.start()
+                repo_details[name]['observer']=thread
+                print(repo_details)
+                print("DEBUG")
+            except Exception as e:
+                print(e)
+            finally:
+                print('Repository {} created'.format(name))
     return "Repository created"
 
 
@@ -93,14 +93,8 @@ def checkout(repo_name, commit):
     log = repository.get_log()
     return log
         
-@app.route('/pause/<repo_name>')
-def pause(repo_name):
-    observer = repo[repo_name]['observer']
-    observer.pause_thread()
-    return "paused"
-
-@app.route('/cont/<repo_name>')
-def cont(repo_name):
-    observer = repo[repo_name]['observer']
-    observer.cont_thread()
-    return "continued"
+@app.route('/list_commits/<repo_name>')
+def list_commit(repo_name):
+    rp = ap(repo_details[repo_name]['path'], repo_name)
+    list_of_commits = rp.get_list_commits()
+    return jsonify(list_of_commits)
