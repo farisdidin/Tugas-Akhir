@@ -1,12 +1,19 @@
 import collections
 import os
 import sys
+import requests
+
 from flask import jsonify
+from flask import render_template
+from flask_sqlalchemy import SQLAlchemy
+from flask_admin import Admin
+
 
 from app import app
 from app.src.ApplicationRepo import ApplicationRepo as ap
 from app.src.Observer import ObserverThread as ot
 
+# app.config['SQLALCHEMY_DATABASE_URI']='mysql://didin:Underground23@localhost/tugas_akhir'
 
 repo_details = collections.defaultdict(dict)
 path_tftp = "./config/tftp"
@@ -30,10 +37,15 @@ for i in repo_details:
 
 print(repo_details)
 
+
+@app.route('/login')
+def login():
+    return render_template('page_login.html')
+
 @app.route('/')
 def begin():
-
-    return "API from configuration management"
+    return render_template('dashboard.html')
+    # return "API from configuration management"
 
 
 @app.route('/list_all')
@@ -69,6 +81,7 @@ def create_repo(protocol, name):
                 print("{} {}".format(name, path))
                 
                 rp = ap(path,name)
+                rp.create_gitea_repo()
                 rp.push()
                 repo_details[name]['path']=path
                 thread = ot(path,name)

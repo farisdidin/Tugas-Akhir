@@ -4,5 +4,6 @@ source/
 test/
 UC_TA.mdj
 __pycache__/
+test-gitea/
 date.py
 test-git.py

@@ -1,5 +1,6 @@
 import datetime
 import collections
+import requests
 from git import Repo, Git
 
 class ApplicationRepo():
@@ -8,9 +9,25 @@ class ApplicationRepo():
         self.repo = Repo(repo_path)
         self.repo_path = repo_path
         self.repoName = repo_name
+        self.api_endpoint = "http://10.151.36.182/api/v1/user/repos"
+        self.api_token = "token 1aed949ff544f998566a6d6693e11a0fb138bbb2"
 
     # def init_repo(self):
     #     Repo.init(self.repo_path)
+
+    def create_gitea_repo(self):
+        data_create = {
+            "auto_init": True,
+            "description": "string_description",
+
+            "issue_labels": "string_labels",
+            "name": self.repoName,
+            "private": False
+        }
+
+        requests.post(url= self.api_endpoint, headers={'Authorization' : self.api_token}, data= data_create )
+
+
 
     def get_branches(self):
         branch = self.repo.git.branch()
