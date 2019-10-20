@@ -9,8 +9,9 @@ class ApplicationRepo():
         self.repo = Repo(repo_path)
         self.repo_path = repo_path
         self.repoName = repo_name
-        self.api_endpoint = "http://10.151.36.182/api/v1/user/repos"
+        self.api_endpoint = "http://gitea-web/api/v1/user/repos"
         self.api_token = "token 1aed949ff544f998566a6d6693e11a0fb138bbb2"
+        self.repo_url = "http://didin:didin23@gitea-web/didin/"+self.repoName+".git"
 
     # def init_repo(self):
     #     Repo.init(self.repo_path)
@@ -18,7 +19,7 @@ class ApplicationRepo():
     def create_gitea_repo(self):
         data_create = {
             "auto_init": True,
-            "description": "string_description",
+            "description": "Readme for device "+ self.repoName,
 
             "issue_labels": "string_labels",
             "name": self.repoName,
@@ -26,6 +27,8 @@ class ApplicationRepo():
         }
 
         requests.post(url= self.api_endpoint, headers={'Authorization' : self.api_token}, data= data_create )
+        g=self.repo.git
+        g.remote('add', 'origin', self.repo_url)
 
 
 
@@ -69,8 +72,12 @@ class ApplicationRepo():
             dateNow = datetime.datetime.now()
             self.repo.git.add('.')
             self.repo.index.commit(dateNow.strftime("%Y-%m-%d %H-%M-%S"))
-            # origin = repo.remote(name='origin')
-            # origin.push()
+            origin = self.repo.remote(name='origin')
+            current_commit = self.get_head()
+            index_branch = self.get_hash_branches().index(current_commit)
+            current_branch = self.get_branches()[index_branch]
+            
+            origin.push(current_branch)
             print(self.repo)
             # print(path)
         except Exception as e:
@@ -80,6 +87,9 @@ class ApplicationRepo():
             print("Push completed")
 
         print("push function are called")
+
+    def pull(self):
+        self.repo.git.pull('origin', 'master')
 
     def create_branch(self):
         g = self.repo.git

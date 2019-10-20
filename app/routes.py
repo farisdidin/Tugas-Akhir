@@ -75,14 +75,15 @@ def create_repo(protocol, name):
             path = "./config/"+protocol+"/"+name
             try:
                 os.mkdir(path)
-                initiate_file = path+"/intial"
-                f = open(initiate_file,'w+')
-                f.close()
+                # initiate_file = path+"/intial"
+                # f = open(initiate_file,'w+')
+                # f.close()
                 print("{} {}".format(name, path))
                 
                 rp = ap(path,name)
                 rp.create_gitea_repo()
-                rp.push()
+                rp.pull()
+                # rp.push()
                 repo_details[name]['path']=path
                 thread = ot(path,name)
                 thread.start()
@@ -92,8 +93,10 @@ def create_repo(protocol, name):
             except Exception as e:
                 print(e)
             finally:
-                print('Repository {} created'.format(name))
-    return "Repository created"
+                # print('Repository {} created'.format(name))
+                info = 'Repository {} created'.format(name)
+                return info
+    return "Repository already exist"
 
 
 @app.route('/checkout/<repo_name>/<commit>')
@@ -111,3 +114,19 @@ def list_commit(repo_name):
     rp = ap(repo_details[repo_name]['path'], repo_name)
     list_of_commits = rp.get_list_commits()
     return jsonify(list_of_commits)
+
+@app.route('/head/<repo_name>')
+def current_head(repo_name):
+    rp = ap(repo_details[repo_name]['path'], repo_name)
+    current_head = rp.get_head()
+    if current_head in rp.get_hash_branches():
+        index = rp.get_hash_branches().index(current_head)
+        info = rp.get_branches()[index]
+        print(info)
+        print('branch')
+    else:
+        info = current_head
+        print('commit')
+
+    info = 'current head are '+info
+    return info
