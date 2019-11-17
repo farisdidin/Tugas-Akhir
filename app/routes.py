@@ -118,8 +118,11 @@ def list_commit(repo_name):
 
 @app.route('/head/<repo_name>')
 def current_head(repo_name):
+    response =  collections.defaultdict(dict)
+
     rp = ap(repo_details[repo_name]['path'], repo_name)
     current_head = rp.get_head()
+    hash_head = current_head
     if current_head in rp.get_hash_branches():
         index = rp.get_hash_branches().index(current_head)
         info = rp.get_branches()[index]
@@ -129,5 +132,8 @@ def current_head(repo_name):
         info = current_head
         print('commit')
 
-    info = 'current head are '+info
-    return info
+    # info =hash_head+" "+info
+    response["branch"] = info
+    response["hash"] = hash_head
+     
+    return jsonify(response)
