@@ -9,9 +9,9 @@ class ApplicationRepo():
         self.repo = Repo(repo_path)
         self.repo_path = repo_path
         self.repoName = repo_name
-        self.api_endpoint = "http://gitea-web/api/v1/user/repos"
-        self.api_token = "token 1aed949ff544f998566a6d6693e11a0fb138bbb2"
-        self.repo_url = "http://didin:didin23@gitea-web/didin/"+self.repoName+".git"
+        self.api_endpoint = "http://localhost:3000/api/v1/user/repos"
+        self.api_token = "token 5b297d2d0f6e7c6f5d7a7a8de53a776ae008c386"
+        self.repo_url = "http://didin:didin23@localhost:3000/didin/"+self.repoName+".git"
 
     # def init_repo(self):
     #     Repo.init(self.repo_path)
@@ -114,7 +114,9 @@ class ApplicationRepo():
             print(i)
             array_commits = []
             for commit in reversed(commits):
-                short_sha = self.repo.git.rev_parse(commit.hexsha,short=6)
+                short_sha = self.repo.git.rev_parse(commit.hexsha,short=7)
+                if short_sha == self.get_head():
+                    short_sha = short_sha+' {HEAD}'
                 print(short_sha)
                 array_commits.append(short_sha)
             result[i]=array_commits

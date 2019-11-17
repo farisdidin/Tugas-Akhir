@@ -106,8 +106,9 @@ def checkout(repo_name, commit):
     repository = ap(repo_details[repo_name]['path'],repo_name)
     repository.checkout(commit)
     observer.cont_thread()
-    log = repository.get_log()
-    return log
+    # log = repository.get_log()
+    commit = repository.get_list_commits()
+    return jsonify(commit)
         
 @app.route('/list_commits/<repo_name>')
 def list_commit(repo_name):
