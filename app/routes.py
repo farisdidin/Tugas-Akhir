@@ -137,3 +137,4 @@ def current_head(repo_name):
     response["hash"] = hash_head
      
     return jsonify(response)
+    # return hash_head

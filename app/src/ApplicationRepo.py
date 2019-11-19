@@ -44,14 +44,14 @@ class ApplicationRepo():
         return branch_split
 
     def get_hash_branches(self):
-        show_ref = self.repo.git.show_ref(hash=7)
+        show_ref = self.repo.git.show_ref(hash=10)
         show_ref = show_ref.split('\n')
         return show_ref
 
     def get_head(self):
         repo = self.repo
         commit = repo.head.commit
-        commit = repo.git.rev_parse(commit,short=7)
+        commit = repo.git.rev_parse(commit,short=10)
         return commit
 
     def check_repo(self):
@@ -114,7 +114,7 @@ class ApplicationRepo():
             print(i)
             array_commits = []
             for commit in reversed(commits):
-                short_sha = self.repo.git.rev_parse(commit.hexsha,short=7)
+                short_sha = self.repo.git.rev_parse(commit.hexsha,short=10)
                 if short_sha == self.get_head():
                     short_sha = short_sha+' {HEAD}'
                 print(short_sha)
