@@ -68,7 +68,7 @@ def index(repo_name):
     return jsonify(repo_detail)
 
 
-@app.route('/create_repo/<protocol>/<name>')
+@app.route('/create/<protocol>/<name>')
 def create_repo(protocol, name):
     if protocol == 'tftp' or protocol == 'ftp':
         if name not in repo_details:
@@ -81,7 +81,7 @@ def create_repo(protocol, name):
                 print("{} {}".format(name, path))
                 
                 rp = ap(path,name)
-                rp.create_gitea_repo()
+                # rp.create_gitea_repo()
                 rp.pull()
                 # rp.push()
                 repo_details[name]['path']=path
@@ -138,3 +138,19 @@ def current_head(repo_name):
      
     return jsonify(response)
     # return hash_head
+
+
+@app.route('/directory/<repo_name>')
+def directory(repo_name):
+    response =  collections.defaultdict(dict)
+    path1 = os.path.join(path_ftp,repo_name)
+    path2 = os.path.join(path_tftp,repo_name)
+    if os.path.exists(path1):
+        response['result'] = True
+    elif os.path.exists(path2):
+        response['result'] = True
+    else:
+        response['result'] = False
+
+    return jsonify(response)
+

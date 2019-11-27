@@ -89,6 +89,8 @@ class ApplicationRepo():
         print("push function are called")
 
     def pull(self):
+        g=self.repo.git
+        g.remote('add', 'origin', self.repo_url)
         self.repo.git.pull('origin', 'master')
 
     def create_branch(self):
