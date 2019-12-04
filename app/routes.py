@@ -10,14 +10,19 @@ from flask_admin import Admin
 
 
 from app import app
+from app import var
 from app.src.ApplicationRepo import ApplicationRepo as ap
 from app.src.Observer import ObserverThread as ot
 
 # app.config['SQLALCHEMY_DATABASE_URI']='mysql://didin:Underground23@localhost/tugas_akhir'
 
 repo_details = collections.defaultdict(dict)
-path_tftp = "./config/tftp"
-path_ftp = "./config/ftp"
+#path_tftp = "./config/tftp"
+#path_ftp = "./config/ftp"
+path_tftp = var.TFTP
+path_ftp = var.FTP
+
+
 
 for i in os.listdir(path_ftp):
     if os.path.isdir(os.path.join(path_ftp, i)):

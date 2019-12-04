@@ -7,3 +7,4 @@ __pycache__/
 test-gitea/
 date.py
 test-git.py
+app/var.py
