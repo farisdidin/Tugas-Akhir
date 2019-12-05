@@ -1,5 +1,6 @@
 import collections
 import os
+import shutil
 import sys
 import requests
 
@@ -102,6 +103,18 @@ def create_repo(protocol, name):
                 info = 'Repository {} created'.format(name)
                 return info
     return "Repository already exist"
+
+@app.route('/remove/<repo>')
+def remove(repo):
+    response =  collections.defaultdict(dict)
+    if repo in repo_details:
+        path = repo_details[repo]['path']
+        shutil.rmtree(path)
+        del repo_details[repo]
+        response["result"] = "repository "+repo+" is successfully removed" 
+        print(response)
+    
+    return jsonify(response)
 
 
 @app.route('/checkout/<repo_name>/<commit>')
