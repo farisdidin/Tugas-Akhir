@@ -76,6 +76,7 @@ def index(repo_name):
 
 @app.route('/create/<protocol>/<name>')
 def create_repo(protocol, name):
+    response =  collections.defaultdict(dict)
     if protocol == 'tftp' or protocol == 'ftp':
         if name not in repo_details:
             path = "./config/"+protocol+"/"+name
@@ -101,8 +102,10 @@ def create_repo(protocol, name):
             finally:
                 # print('Repository {} created'.format(name))
                 info = 'Repository {} created'.format(name)
-                return info
-    return "Repository already exist"
+                response['result']= info
+                return jsonify(response)
+    response['result']= "Repository already exist" 
+    return jsonify(response)
 
 @app.route('/remove/<repo>')
 def remove(repo):
@@ -110,7 +113,7 @@ def remove(repo):
     if repo in repo_details:
         path = repo_details[repo]['path']
         shutil.rmtree(path)
-        del repo_details[repo]
+        del repo_details[repo] 
         response["result"] = "repository "+repo+" is successfully removed" 
         print(response)
     
