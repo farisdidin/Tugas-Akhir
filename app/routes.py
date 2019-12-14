@@ -79,7 +79,11 @@ def create_repo(protocol, name):
     response =  collections.defaultdict(dict)
     if protocol == 'tftp' or protocol == 'ftp':
         if name not in repo_details:
-            path = "./config/"+protocol+"/"+name
+            if protocol == 'tftp':
+                path = path_tftp+"/"+name
+            elif protocol == 'ftp':
+                path = path_ftp+"/"+name
+            # path = "./config/"+protocol+"/"+name
             try:
                 os.mkdir(path)
                 # initiate_file = path+"/intial"
