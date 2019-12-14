@@ -6,8 +6,8 @@ import requests
 
 from flask import jsonify
 from flask import render_template
-from flask_sqlalchemy import SQLAlchemy
-from flask_admin import Admin
+# from flask_sqlalchemy import SQLAlchemy
+# from flask_admin import Admin
 
 
 from app import app
