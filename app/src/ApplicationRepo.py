@@ -2,6 +2,7 @@ import datetime
 import collections
 import requests
 from git import Repo, Git
+from app import var
 
 class ApplicationRepo():
     def __init__(self,repo_path,repo_name):
@@ -10,8 +11,10 @@ class ApplicationRepo():
         self.repo_path = repo_path
         self.repoName = repo_name
         self.api_endpoint = "http://localhost:3000/api/v1/user/repos"
-        self.api_token = "token 5b297d2d0f6e7c6f5d7a7a8de53a776ae008c386"
-        self.repo_url = "http://didin:didin23@localhost:3000/didin/"+self.repoName+".git"
+        self.api_token = var.API_TOKEN
+        # self.api_token = "token 5b297d2d0f6e7c6f5d7a7a8de53a776ae008c386"
+        self.repo_url = var.URL_GITEA+self.repoName+".git"
+        # self.repo_url = "http://didin:didin23@localhost:3000/didin/"+self.repoName+".git"
 
     # def init_repo(self):
     #     Repo.init(self.repo_path)

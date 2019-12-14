@@ -1,2 +1,4 @@
 TFTP = './config/tftp'
 FTP = './config/ftp'
+API_TOKEN = 'token 5b297d2d0f6e7c6f5d7a7a8de53a776ae008c386'
+URL_GITEA = 'http://didin:didin23@localhost:3000/didin/'
