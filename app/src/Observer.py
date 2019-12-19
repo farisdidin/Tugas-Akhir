@@ -61,7 +61,8 @@ class EventHandler(PatternMatchingEventHandler):
     def __init__(self,repo_name, repo_path):
         print("shitlyfe")
         print(self)
-        super(EventHandler, self).__init__(ignore_patterns=["*/.git/*", "*/tftp"])
+        to_ignore = '*/'+repo_name
+        super(EventHandler, self).__init__(ignore_patterns=["*/.git/*", to_ignore])
         self.repo_name = repo_name
         self.repo_path = repo_path
         self.repository = ar(repo_path,repo_name)
