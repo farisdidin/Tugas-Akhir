@@ -11,9 +11,12 @@ from flask import render_template
 
 
 from app import app
+from app import db
 from app import var
 from app.src.ApplicationRepo import ApplicationRepo as ap
 from app.src.Observer import ObserverThread as ot
+
+from app.Models import Device
 
 # app.config['SQLALCHEMY_DATABASE_URI']='mysql://didin:Underground23@localhost/tugas_akhir'
 
@@ -218,3 +221,9 @@ def directory(repo_name):
 
     return jsonify(response)
 
+@app.route('/insert/<name>/<ip>')
+def create_device(name, ip):
+    device = Device(device_name=name, device_ip=i, device_repo_path='', device_version='')
+    db.session.add(device)
+    db.session.commit()
+    return 'data masuk'
