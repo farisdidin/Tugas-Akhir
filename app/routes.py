@@ -23,18 +23,22 @@ repo_details = collections.defaultdict(dict)
 path_tftp = var.TFTP
 path_ftp = var.FTP
 
-
-
-for i in os.listdir(path_ftp):
-    if os.path.isdir(os.path.join(path_ftp, i)):
-        path = os.path.join(path_ftp, i)
+path_repo = var.PATH
+for i in os.listdir(path_repo):
+    if os.path.isdir(os.path.join(path_repo, i)):
+        path = os.path.join(path_repo, i)
         repo_details[i]['path'] = path
 
-for i in os.listdir(path_tftp):
-    if os.path.isdir(os.path.join(path_tftp, i)):
-        if i not in repo_details:
-            path = os.path.join(path_tftp, i)
-            repo_details[i]['path'] = path
+# for i in os.listdir(path_ftp):
+#     if os.path.isdir(os.path.join(path_ftp, i)):
+#         path = os.path.join(path_ftp, i)
+#         repo_details[i]['path'] = path
+
+# for i in os.listdir(path_tftp):
+#     if os.path.isdir(os.path.join(path_tftp, i)):
+#         if i not in repo_details:
+#             path = os.path.join(path_tftp, i)
+#             repo_details[i]['path'] = path
 
 for i in repo_details:
     thread = ot(repo_details[i]['path'], i)
@@ -73,43 +77,77 @@ def index(repo_name):
         repo_detail[i] = head_branch[branch.index(i)]
     return jsonify(repo_detail)
 
-
-@app.route('/create/<protocol>/<name>')
-def create_repo(protocol, name):
+@app.route('/create/<name>')
+def create_repo(name):
     response =  collections.defaultdict(dict)
-    if protocol == 'tftp' or protocol == 'ftp':
-        if name not in repo_details:
-            if protocol == 'tftp':
-                path = path_tftp+"/"+name
-            elif protocol == 'ftp':
-                path = path_ftp+"/"+name
-            # path = "./config/"+protocol+"/"+name
-            try:
-                os.mkdir(path)
-                # initiate_file = path+"/intial"
-                # f = open(initiate_file,'w+')
-                # f.close()
-                print("{} {}".format(name, path))
-                
-                rp = ap(path,name)
-                # rp.create_gitea_repo()
-                rp.pull()
-                # rp.push()
-                repo_details[name]['path']=path
-                thread = ot(path,name)
-                thread.start()
-                repo_details[name]['observer']=thread
-                print(repo_details)
-                print("DEBUG")
-            except Exception as e:
-                print(e)
-            finally:
-                # print('Repository {} created'.format(name))
-                info = 'Repository {} created'.format(name)
-                response['result']= info
-                return jsonify(response)
+    if name not in repo_details:
+        path = path_repo+"/"+name
+        
+        # path = "./config/"+protocol+"/"+name
+        try:
+            os.mkdir(path)
+            # initiate_file = path+"/intial"
+            # f = open(initiate_file,'w+')
+            # f.close()
+            print("{} {}".format(name, path))
+            
+            rp = ap(path,name)
+            # rp.create_gitea_repo()
+            rp.pull()
+            # rp.push()
+            repo_details[name]['path']=path
+            thread = ot(path,name)
+            thread.start()
+            repo_details[name]['observer']=thread
+            print(repo_details)
+            print("DEBUG")
+        except Exception as e:
+            print(e)
+        finally:
+            # print('Repository {} created'.format(name))
+            info = 'Repository {} created'.format(name)
+            response['result']= info
+            return jsonify(response)
     response['result']= "Repository already exist" 
     return jsonify(response)
+
+# route lama
+# @app.route('/create/<protocol>/<name>')
+# def create_repo(protocol, name):
+#     response =  collections.defaultdict(dict)
+#     if protocol == 'tftp' or protocol == 'ftp':
+#         if name not in repo_details:
+#             if protocol == 'tftp':
+#                 path = path_tftp+"/"+name
+#             elif protocol == 'ftp':
+#                 path = path_ftp+"/"+name
+#             # path = "./config/"+protocol+"/"+name
+#             try:
+#                 os.mkdir(path)
+#                 # initiate_file = path+"/intial"
+#                 # f = open(initiate_file,'w+')
+#                 # f.close()
+#                 print("{} {}".format(name, path))
+                
+#                 rp = ap(path,name)
+#                 # rp.create_gitea_repo()
+#                 rp.pull()
+#                 # rp.push()
+#                 repo_details[name]['path']=path
+#                 thread = ot(path,name)
+#                 thread.start()
+#                 repo_details[name]['observer']=thread
+#                 print(repo_details)
+#                 print("DEBUG")
+#             except Exception as e:
+#                 print(e)
+#             finally:
+#                 # print('Repository {} created'.format(name))
+#                 info = 'Repository {} created'.format(name)
+#                 response['result']= info
+#                 return jsonify(response)
+#     response['result']= "Repository already exist" 
+#     return jsonify(response)
 
 @app.route('/remove/<repo>')
 def remove(repo):
@@ -168,12 +206,12 @@ def current_head(repo_name):
 @app.route('/directory/<repo_name>')
 def directory(repo_name):
     response =  collections.defaultdict(dict)
-    path1 = os.path.join(path_ftp,repo_name)
-    path2 = os.path.join(path_tftp,repo_name)
+    path1 = os.path.join(path_repo,repo_name)
+    # path2 = os.path.join(path_tftp,repo_name)
     if os.path.exists(path1):
         response['result'] = True
-    elif os.path.exists(path2):
-        response['result'] = True
+    # elif os.path.exists(path2):
+    #     response['result'] = True
     else:
         response['result'] = False
 

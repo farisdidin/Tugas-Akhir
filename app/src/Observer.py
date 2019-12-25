@@ -74,7 +74,7 @@ class EventHandler(PatternMatchingEventHandler):
     
         if event.event_type in eventType:
             pathSplit = event.src_path.split("/")
-            if len(pathSplit) > 4:
+            if len(pathSplit) > 3:
                 if ".git" not in pathSplit:
                     print(event.event_type)
                     print(event.src_path)
