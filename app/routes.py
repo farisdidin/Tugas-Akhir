@@ -4,7 +4,7 @@ import shutil
 import sys
 import requests
 
-from flask import jsonify
+from flask import jsonify, request
 from flask import render_template
 # from flask_sqlalchemy import SQLAlchemy
 # from flask_admin import Admin
@@ -13,8 +13,10 @@ from flask import render_template
 from app import app
 from app import db
 from app import var
+
 from app.src.ApplicationRepo import ApplicationRepo as ap
 from app.src.Observer import ObserverThread as ot
+from app.src.Repository import Repository as local_repo
 
 from app.Models import Device
 
@@ -221,9 +223,41 @@ def directory(repo_name):
 
     return jsonify(response)
 
-@app.route('/insert/<name>/<ip>')
-def create_device(name, ip):
-    device = Device(device_name=name, device_ip=i, device_repo_path='', device_version='')
-    db.session.add(device)
-    db.session.commit()
-    return 'data masuk'
+# @app.route('/insert/<name>/<ip>')
+# def create_device(name, ip):
+#     device = Device(device_name=name, device_ip=i, device_repo_path='', device_version='')
+#     db.session.add(device)
+#     db.session.commit()
+#     return 'data masuk'
+
+@app.route('/v2/create', methods=['GET', 'POST'])
+def create():
+    if request.method == 'POST':
+        name = request.form.get('name')
+        address = request.form.get('address')
+        try:
+            device = Device(device_name=name, device_ip=address, device_repo_path='', device_version='')
+            db.session.add(device)
+            db.session.commit()
+            
+            repo = local_repo(name)
+            path = repo.create()
+            path_repo = Device.query.filter_by(device_name=name).first()
+            path_repo.device_repo_path = path 
+            db.session.commit()
+            
+        except Exception as e:
+            # print("Unexpected error:", sys.exc_info()[0])
+            print("menampilkan"+ str(e))
+            
+        print(name)
+        return str(name)
+    if request.method == 'GET':
+        devices = Device.query.order_by(Device.device_name).all()
+        for device in devices:
+            print(device.device_name)
+        
+        return 'lala'
+
+    # device_name = request.args.get['name']
+    # device_address = request.args['address']
