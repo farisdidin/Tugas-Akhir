@@ -23,8 +23,6 @@ class ApplicationRepo():
         data_create = {
             "auto_init": True,
             "description": "Readme for device "+ self.repoName,
-
-            "issue_labels": "string_labels",
             "name": self.repoName,
             "private": False
         }
@@ -93,7 +91,7 @@ class ApplicationRepo():
 
     def pull(self):
         g=self.repo.git
-        g.remote('add', 'origin', self.repo_url)
+        # g.remote('add', 'origin', self.repo_url)
         self.repo.git.pull('origin', 'master')
 
     def create_branch(self):

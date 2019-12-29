@@ -20,37 +20,29 @@ from app.src.Repository import Repository as local_repo
 
 from app.Models import Device
 
-# app.config['SQLALCHEMY_DATABASE_URI']='mysql://didin:Underground23@localhost/tugas_akhir'
-
 repo_details = collections.defaultdict(dict)
-#path_tftp = "./config/tftp"
-#path_ftp = "./config/ftp"
-path_tftp = var.TFTP
-path_ftp = var.FTP
 
+OBSERVER = collections.defaultdict(dict)
 
-path_repo = var.PATH
-for i in os.listdir(path_repo):
-    if os.path.isdir(os.path.join(path_repo, i)):
-        path = os.path.join(path_repo, i)
-        repo_details[i]['path'] = path
-
-# for i in os.listdir(path_ftp):
-#     if os.path.isdir(os.path.join(path_ftp, i)):
-#         path = os.path.join(path_ftp, i)
-#         repo_details[i]['path'] = path
-
-# for i in os.listdir(path_tftp):
-#     if os.path.isdir(os.path.join(path_tftp, i)):
-#         if i not in repo_details:
-#             path = os.path.join(path_tftp, i)
-#             repo_details[i]['path'] = path
-
-for i in repo_details:
-    thread = ot(repo_details[i]['path'], i)
-    repo_details[i]['observer']=thread
+devices = Device.query.order_by(Device.device_name).all()
+for device in devices:
+    thread = ot(device.device_repo_path,device.device_name)
+    OBSERVER[device.device_name]['observer']=thread
     thread.start()
 
+# path_repo = var.PATH
+# for i in os.listdir(path_repo):
+#     if os.path.isdir(os.path.join(path_repo, i)):
+#         path = os.path.join(path_repo, i)
+#         repo_details[i]['path'] = path
+
+
+# for i in repo_details:
+#     thread = ot(repo_details[i]['path'], i)
+#     repo_details[i]['observer']=thread
+#     thread.start()
+
+print(OBSERVER)
 print(repo_details)
 
 
@@ -116,44 +108,6 @@ def create_repo(name):
             return jsonify(response)
     response['result']= "Repository already exist" 
     return jsonify(response)
-
-# route create lama
-# @app.route('/create/<protocol>/<name>')
-# def create_repo(protocol, name):
-#     response =  collections.defaultdict(dict)
-#     if protocol == 'tftp' or protocol == 'ftp':
-#         if name not in repo_details:
-#             if protocol == 'tftp':
-#                 path = path_tftp+"/"+name
-#             elif protocol == 'ftp':
-#                 path = path_ftp+"/"+name
-#             # path = "./config/"+protocol+"/"+name
-#             try:
-#                 os.mkdir(path)
-#                 # initiate_file = path+"/intial"
-#                 # f = open(initiate_file,'w+')
-#                 # f.close()
-#                 print("{} {}".format(name, path))
-                
-#                 rp = ap(path,name)
-#                 # rp.create_gitea_repo()
-#                 rp.pull()
-#                 # rp.push()
-#                 repo_details[name]['path']=path
-#                 thread = ot(path,name)
-#                 thread.start()
-#                 repo_details[name]['observer']=thread
-#                 print(repo_details)
-#                 print("DEBUG")
-#             except Exception as e:
-#                 print(e)
-#             finally:
-#                 # print('Repository {} created'.format(name))
-#                 info = 'Repository {} created'.format(name)
-#                 response['result']= info
-#                 return jsonify(response)
-#     response['result']= "Repository already exist" 
-#     return jsonify(response)
 
 @app.route('/remove/<repo>')
 def remove(repo):
@@ -223,12 +177,6 @@ def directory(repo_name):
 
     return jsonify(response)
 
-# @app.route('/insert/<name>/<ip>')
-# def create_device(name, ip):
-#     device = Device(device_name=name, device_ip=i, device_repo_path='', device_version='')
-#     db.session.add(device)
-#     db.session.commit()
-#     return 'data masuk'
 
 @app.route('/v2/create', methods=['GET', 'POST'])
 def create():
@@ -242,10 +190,11 @@ def create():
             
             repo = local_repo(name)
             path = repo.create()
-            path_repo = Device.query.filter_by(device_name=name).first()
-            path_repo.device_repo_path = path 
+            device_record = Device.query.filter_by(device_name=name).first()
+            device_record.device_repo_path = path 
             db.session.commit()
-            
+            OBSERVER[name]['observer'] = ot( device_record.device_repo_path, device_record.device_name)
+            OBSERVER[name]['observer'].start()
         except Exception as e:
             # print("Unexpected error:", sys.exc_info()[0])
             print("menampilkan"+ str(e))
@@ -255,7 +204,9 @@ def create():
     if request.method == 'GET':
         devices = Device.query.order_by(Device.device_name).all()
         for device in devices:
-            print(device.device_name)
+            print("name : "+device.device_name)
+            print("address : "+device.device_ip)
+            
         
         return 'lala'
 

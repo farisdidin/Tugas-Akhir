@@ -60,6 +60,7 @@ class PausingObserver(Observer):
 class EventHandler(PatternMatchingEventHandler):
     def __init__(self,repo_name, repo_path):
         print("shitlyfe")
+        print(repo_path)
         print(self)
         to_ignore = '*/'+repo_name
         super(EventHandler, self).__init__(ignore_patterns=["*/.git/*", to_ignore])
