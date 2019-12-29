@@ -52,11 +52,15 @@ class ApplicationRepo():
     def get_head(self):
         repo = self.repo
         commit = repo.head.commit
+        message = repo.head.commit.message
         commit = repo.git.rev_parse(commit,short=10)
-        return commit
+        result = collections.defaultdict(dict)
+        result["commit"]=commit
+        result["message"]=message
+        return result
 
     def check_repo(self):
-        head = self.get_head()
+        head = self.get_head()['commit']
         if head in self.get_hash_branches():
             return True
         else:
@@ -64,7 +68,7 @@ class ApplicationRepo():
 
     def checkout_to_branch(self):
         g = self.repo.git()
-        branch_index = self.get_hash_branches().index(self.get_head())
+        branch_index = self.get_hash_branches().index(self.get_head()['commit'])
         branch = self.get_branches()[branch_index]
         g.checkout(branch)
 
@@ -74,7 +78,7 @@ class ApplicationRepo():
             self.repo.git.add('.')
             self.repo.index.commit(dateNow.strftime("%Y-%m-%d %H-%M-%S"))
             origin = self.repo.remote(name='origin')
-            current_commit = self.get_head()
+            current_commit = self.get_head()['commit']
             index_branch = self.get_hash_branches().index(current_commit)
             current_branch = self.get_branches()[index_branch]
             
@@ -118,7 +122,7 @@ class ApplicationRepo():
             array_commits = []
             for commit in reversed(commits):
                 short_sha = self.repo.git.rev_parse(commit.hexsha,short=10)
-                if short_sha == self.get_head():
+                if short_sha == self.get_head()['commit']:
                     short_sha = short_sha+' {HEAD}'
                 print(short_sha)
                 array_commits.append(short_sha)

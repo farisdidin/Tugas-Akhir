@@ -30,7 +30,7 @@ for device in devices:
     OBSERVER[device.device_name]['observer']=thread
     thread.start()
 
-# path_repo = var.PATH
+path_repo = var.PATH
 # for i in os.listdir(path_repo):
 #     if os.path.isdir(os.path.join(path_repo, i)):
 #         path = os.path.join(path_repo, i)
@@ -166,7 +166,7 @@ def current_head(repo_name):
 @app.route('/directory/<repo_name>')
 def directory(repo_name):
     response =  collections.defaultdict(dict)
-    path1 = os.path.join(path_ftp,repo_name)
+    path1 = os.path.join(path_repo,repo_name)
     # path2 = os.path.join(path_tftp,repo_name)
     if os.path.exists(path1):
         response['result'] = True
@@ -187,7 +187,6 @@ def create():
             device = Device(device_name=name, device_ip=address, device_repo_path='', device_version='')
             db.session.add(device)
             db.session.commit()
-            
             repo = local_repo(name)
             path = repo.create()
             device_record = Device.query.filter_by(device_name=name).first()
@@ -207,8 +206,12 @@ def create():
             print("name : "+device.device_name)
             print("address : "+device.device_ip)
             
-        
         return 'lala'
 
-    # device_name = request.args.get['name']
-    # device_address = request.args['address']
+@app.route('/v2/head/<reponame>')
+def head(reponame):
+    device_record = Device.query.filter_by(device_name=reponame).first()
+    repo = ap(device_record.device_repo_path,reponame)
+    result = repo.get_head()
+    return result
+

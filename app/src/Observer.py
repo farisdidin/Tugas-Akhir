@@ -10,6 +10,8 @@ from watchdog.events import PatternMatchingEventHandler
 from git import Repo, Git
 
 from app.src.ApplicationRepo import ApplicationRepo as ar
+from app.Models import Device
+from app import db
 
 class ObserverThread(threading.Thread):
     def __init__(self,path,name):
@@ -88,6 +90,11 @@ class EventHandler(PatternMatchingEventHandler):
                     else:
                         self.repository.create_branch()
                         self.repository.push()
+                    
+                    record = Device.query.filter_by(device_name=self.repo_name).first()
+                    record.device_version = self.repository.get_head()['message']
+                    db.session.commit()
+                    
 
 
                     # self.update_branch()
