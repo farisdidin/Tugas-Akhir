@@ -14,5 +14,5 @@ class Repository():
         repo = ar(path_create,self.name)
         repo.create_gitea_repo()
         repo.pull()
-        
-        return path_create
+        version = repo.get_head()['message']
+        return path_create, version

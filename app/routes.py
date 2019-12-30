@@ -4,7 +4,7 @@ import shutil
 import sys
 import requests
 
-from flask import jsonify, request
+from flask import jsonify, request, Response, redirect, url_for
 from flask import render_template
 # from flask_sqlalchemy import SQLAlchemy
 # from flask_admin import Admin
@@ -50,9 +50,11 @@ print(repo_details)
 def login():
     return render_template('page_login.html')
 
-@app.route('/')
-def begin():
-    return render_template('dashboard.html')
+@app.route('/<test>')
+def begin(test):
+    nano = test
+    print(nano)
+    return render_template('base.html', title=nano)
     # return "API from configuration management"
 
 
@@ -142,9 +144,9 @@ def list_commit(repo_name):
 @app.route('/head/<repo_name>')
 def current_head(repo_name):
     response =  collections.defaultdict(dict)
-
-    rp = ap(repo_details[repo_name]['path'], repo_name)
-    current_head = rp.get_head()
+    record = Device.query.filter_by(device_name=repo_name).first()
+    rp = ap(record.device_repo_path, repo_name)
+    current_head = rp.get_head()['commit']
     hash_head = current_head
     if current_head in rp.get_hash_branches():
         index = rp.get_hash_branches().index(current_head)
@@ -188,9 +190,10 @@ def create():
             db.session.add(device)
             db.session.commit()
             repo = local_repo(name)
-            path = repo.create()
+            path,version = repo.create()
             device_record = Device.query.filter_by(device_name=name).first()
             device_record.device_repo_path = path 
+            device_record.device_version = version
             db.session.commit()
             OBSERVER[name]['observer'] = ot( device_record.device_repo_path, device_record.device_name)
             OBSERVER[name]['observer'].start()
@@ -199,19 +202,34 @@ def create():
             print("menampilkan"+ str(e))
             
         print(name)
-        return str(name)
+        return redirect(url_for('create'))
+
     if request.method == 'GET':
         devices = Device.query.order_by(Device.device_name).all()
         for device in devices:
             print("name : "+device.device_name)
             print("address : "+device.device_ip)
             
-        return 'lala'
+        return render_template('dashboard.html', devices=devices)
 
-@app.route('/v2/head/<reponame>')
-def head(reponame):
+@app.route('/v2/<repo>/branch/<branchname>')
+def repo(repo, branchname):
+    device_record = Device.query.filter_by(device_name=repo).first()
+    path = device_record.device_repo_path
+    rp = ap(path, repo)
+    list_of_commits = rp.get_list_commits()
+    return jsonify(list_of_commits[branchname])
+
+@app.route('/v2/show/<reponame>/<filename>')
+def show(reponame, filename):
     device_record = Device.query.filter_by(device_name=reponame).first()
-    repo = ap(device_record.device_repo_path,reponame)
-    result = repo.get_head()
-    return result
+    path = device_record.device_repo_path
+    file_path = os.path.join(path,filename)
+    with open(file_path,"r") as f:
+        content = f.read()
+
+    return Response(content, mimetype='text/plain')
+
+    
+    
 
