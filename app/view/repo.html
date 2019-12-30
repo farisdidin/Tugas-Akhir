@@ -6,7 +6,7 @@
   <title>Configuration versioning</title>
   <!-- Tell the browser to be responsive to screen width -->
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  
+
   <!-- Font Awesome -->
   <link rel="stylesheet" href="{{ url_for('static', filename='plugins/fontawesome-free/css/all.min.css') }}">
   <!-- Ionicons -->
@@ -54,8 +54,8 @@
   <!-- Main Sidebar Container -->
   <aside class="main-sidebar sidebar-dark-primary elevation-4">
     <!-- Brand Logo -->
-    <a href="../static/index3.html" class="brand-link">
-      <img src="../static/dist/img/AdminLTELogo.png"
+    <a href="{{ url_for('static', filename='index3.html') }}" class="brand-link">
+      <img src="{{ url_for('static', filename='dist/img/AdminLTELogo.png') }}"
            alt="AdminLTE Logo"
            class="brand-image img-circle elevation-3"
            style="opacity: .8">
@@ -67,7 +67,7 @@
       <!-- Sidebar user (optional) -->
       <div class="user-panel mt-3 pb-3 mb-3 d-flex">
         <div class="image">
-          <img src="../static/dist/img/user2-160x160.jpg" class="img-circle elevation-2" alt="User Image">
+          <img src="{{ url_for('static', filename='dist/img/user2-160x160.jpg') }}" class="img-circle elevation-2" alt="User Image">
         </div>
         <div class="info">
           <a href="#" class="d-block">Alexander Pierce</a>
@@ -94,8 +94,8 @@
           </div>
           <div class="col-sm-6">
             <ol class="breadcrumb float-sm-right">
-              <li class="breadcrumb-item"><a href="/v2">Home</a></li>
-              
+              <li class="breadcrumb-item"><a href="{{ url_for('create') }}">Home</a></li>
+              <li class="breadcrumb-item active">Blank Page</li>
             </ol>
           </div>
         </div>
@@ -110,24 +110,44 @@
         <div class="col-md-6">
           <div class="card">
             <div class="card-header">
-              <h3 class="card-title">Devices</h3>
+              <div class="row">
+                <div class="col-6">
+                  <h3 class="card-title">{{ reponame }}</h3>
+                </div>
+                <div class="col-6">
+                  <div class="dropdown">
+                      <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                          {{ branch }}
+                        </button>
+                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                            {% for i in branches %}
+                            <a class="dropdown-item" href="{{ url_for('repo', repo=reponame, branchname=i)}}">{{ i }}</a>
+                            {% endfor %}
+                        </div>
+                  </div>
+                </div>
+              </div>
             </div>
             <!-- /.card-header -->
             <div class="card-body p-0">
               <table class="table table-condensed">
                 <thead>
                   <tr>
-                    <th>Device Name</th>
-                    <th>IP Address</th>
+                    <th>Commit</th>
                     <th>Version</th>
+                    <th>Action</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {% for device in devices %}
+                  {% for commit in commits %}
                     <tr>
-                      <td> <a href="http://localhost:5000/v2/{{ device.device_name }}/branch/master">{{ device.device_name }}</a></td>
-                      <td>{{ device.device_ip }}</td>
-                      <td>{{ device.device_version }}</td>  
+                      <td><a href="http://localhost:3000/faris/{{ reponame }}/commit/{{ commit[0] }}?style=split" target="_blank">{{ commit[0] }}</a></td>
+                      <td>{{ commit[1] }}</td>
+                      {% if commit[2] == 'HEAD' %}
+                          <td> <a href="" class="btn btn-danger" >HEAD</a> </td>
+                      {% else %}
+                          <td> <a href="/v2/checkout/{{ reponame }}/{{ commit[0] }}" class="btn btn-primary">Checkout</a> </td>
+                      {% endif %}
                     </tr>
                   {% endfor %}
                   
@@ -139,34 +159,6 @@
 
         </div>
         <div class="col-md-6">
-          <div class="card card-primary">
-            <div class="card-header">
-              <h3 class="card-title">Add Device</h3>
-            </div>
-            <!-- /.card-header -->
-            <!-- form start -->
-            <form role="form" action="/v2/create" method="post">
-              <div class="card-body">
-                <div class="form-group">
-                  <label for="exampleInputEmail1">Device Name</label>
-                  <div>
-                    <input  class="form-control" id="name" name="name" placeholder="device name">
-                  </div>
-                </div>
-                <div class="form-group">
-                  <label for="exampleInputPassword1">Device Address</label>
-                  <div >
-                    <input class="form-control" id="address" name="address" placeholder="device address">
-                    </div>
-                </div>
-              </div>
-              <!-- /.card-body -->
-    
-              <div class="card-footer">
-                <button type=submit class="btn btn-primary">Submit</button>
-              </div>
-            </form>
-          </div>
           
           </div>
 

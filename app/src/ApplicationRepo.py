@@ -120,14 +120,19 @@ class ApplicationRepo():
             commits = list(self.repo.iter_commits(i))
             print(i)
             array_commits = []
+            result[i] = []
             for commit in reversed(commits):
                 short_sha = self.repo.git.rev_parse(commit.hexsha,short=10)
+                message = commit.message
                 if short_sha == self.get_head()['commit']:
-                    short_sha = short_sha+' {HEAD}'
-                print(short_sha)
-                array_commits.append(short_sha)
-            result[i]=array_commits
+                    result[i].append([short_sha, message, 'HEAD'])
+                else:
+                    result[i].append([short_sha, message])
 
-        return result
+                print(short_sha)
+                array_commits.append(short_sha+ ' ' +message)
+            # result[i]=array_commits
+
+        return result,branches
 
     

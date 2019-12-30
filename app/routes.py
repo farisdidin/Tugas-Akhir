@@ -125,7 +125,7 @@ def remove(repo):
 
 
 @app.route('/checkout/<repo_name>/<commit>')
-def checkout(repo_name, commit):
+def checkout_commit(repo_name, commit):
     observer = repo_details[repo_name]['observer']
     observer.pause_thread()
     repository = ap(repo_details[repo_name]['path'],repo_name)
@@ -137,7 +137,8 @@ def checkout(repo_name, commit):
         
 @app.route('/list_commits/<repo_name>')
 def list_commit(repo_name):
-    rp = ap(repo_details[repo_name]['path'], repo_name)
+    record = Device.query.filter_by(device_name=repo_name).first()
+    rp = ap(record.device_repo_path, repo_name)
     list_of_commits = rp.get_list_commits()
     return jsonify(list_of_commits)
 
@@ -180,7 +181,7 @@ def directory(repo_name):
     return jsonify(response)
 
 
-@app.route('/v2/create', methods=['GET', 'POST'])
+@app.route('/v2', methods=['GET', 'POST'])
 def create():
     if request.method == 'POST':
         name = request.form.get('name')
@@ -193,7 +194,7 @@ def create():
             path,version = repo.create()
             device_record = Device.query.filter_by(device_name=name).first()
             device_record.device_repo_path = path 
-            device_record.device_version = version
+            device_record.device_version = version 
             db.session.commit()
             OBSERVER[name]['observer'] = ot( device_record.device_repo_path, device_record.device_name)
             OBSERVER[name]['observer'].start()
@@ -217,12 +218,12 @@ def repo(repo, branchname):
     device_record = Device.query.filter_by(device_name=repo).first()
     path = device_record.device_repo_path
     rp = ap(path, repo)
-    list_of_commits = rp.get_list_commits()
-    return jsonify(list_of_commits[branchname])
+    list_of_commits,branches = rp.get_list_commits()
+    return render_template('repo.html', commits=list_of_commits[branchname], reponame=repo, branches=branches, branch=branchname)
 
-@app.route('/v2/show/<reponame>/<filename>')
-def show(reponame, filename):
-    device_record = Device.query.filter_by(device_name=reponame).first()
+@app.route('/v2/show/<repo>/<filename>')
+def show(repo, filename):
+    device_record = Device.query.filter_by(device_name=repo).first()
     path = device_record.device_repo_path
     file_path = os.path.join(path,filename)
     with open(file_path,"r") as f:
@@ -230,6 +231,18 @@ def show(reponame, filename):
 
     return Response(content, mimetype='text/plain')
 
+@app.route('/v2/checkout/<repo>/<commit>')
+def checkout(repo, commit):
+    observer = OBSERVER[repo]['observer']
+    observer.pause_thread()
+    device_record = Device.query.filter_by(device_name=repo).first()
+    path = device_record.device_repo_path
+    repository = ap(path,repo)
+    repository.checkout(commit)
+    observer.cont_thread()
+    # log = repository.get_log()
+    commit = repository.get_list_commits()
+    return redirect(url_for('repo', repo=repo, branchname='master'))
     
     
 
