@@ -243,6 +243,18 @@ def checkout(repo, commit):
     # log = repository.get_log()
     commit = repository.get_list_commits()
     return redirect(url_for('repo', repo=repo, branchname='master'))
+
+@app.route('/v2/delete/<repo>')
+def delete(repo):
+    device_record = Device.query.filter_by(device_name=repo).first()
+    path = device_record.device_repo_path
+    repo = ap(path,repo)
+    repo.remove_gitea_repo()
+    db.session.delete(device_record)
+    db.session.commit()
+    shutil.rmtree(path)
+    print(path)
+    return redirect(url_for('create'))
     
     
 

@@ -31,7 +31,9 @@ class ApplicationRepo():
         g=self.repo.git
         g.remote('add', 'origin', self.repo_url)
 
-
+    def remove_gitea_repo(self):
+        endpoint = 'http://localhost:3000/api/v1/repos/faris/'+self.repoName
+        requests.delete(url=endpoint, headers={'Authorization' : self.api_token} )
 
     def get_branches(self):
         branch = self.repo.git.branch()
