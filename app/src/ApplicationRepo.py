@@ -123,7 +123,7 @@ class ApplicationRepo():
             print(i)
             array_commits = []
             result[i] = []
-            for commit in reversed(commits):
+            for commit in commits:
                 short_sha = self.repo.git.rev_parse(commit.hexsha,short=10)
                 message = commit.message
                 if short_sha == self.get_head()['commit']:

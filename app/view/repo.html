@@ -108,9 +108,6 @@
     <!-- Main content -->
     <section class="content">
       <!-- MODAL -->
-      <!-- <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
-        Launch demo modal
-      </button> -->
       
       <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
@@ -160,7 +157,7 @@
             </div>
             <!-- /.card-header -->
             <div class="card-body p-0">
-              <table  id='commit_table' class="table table-condensed">
+              <table  id='commit_table' class="table table-bordered table-hover">
                 <thead>
                   <tr>
                     <th>Commit</th>
@@ -189,8 +186,15 @@
 
         </div>
         <div class="col-md-6">
-          
-          </div>
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">Destination</h3>
+            </div>
+            <div class="card-body">
+
+            </div>
+          </div>  
+        </div>
 
       </div>
 
@@ -232,9 +236,10 @@
   $(function () {
     $('#commit_table').DataTable({
       "paging": true,
-      "lengthChange": false,
+      "lengthChange": true,
       "searching": false,
-      "ordering": true,
+      "ordering": false,
+      "lengthMenu": [[5, 10, 25, 50, -1], [5, 10, 25, 50, "All"]],
       "info": true,
       "autoWidth": false,
     });
