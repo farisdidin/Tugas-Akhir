@@ -168,7 +168,7 @@
                 <tbody>
                   {% for commit in commits %}
                     <tr>
-                      <td><a href="http://localhost:3000/faris/{{ reponame }}/commit/{{ commit[0] }}?style=split" target="_blank">{{ commit[0] }}</a></td>
+                      <td><a href="http://{{ Address }}:3000/faris/{{ reponame }}/commit/{{ commit[0] }}?style=split" target="_blank">{{ commit[0] }}</a></td>
                       <td>{{ commit[1] }}</td>
                       {% if commit[2] == 'HEAD' %}
                           <td> <button disabled="disabled" class="btn btn-danger" > HEAD</button> </td>

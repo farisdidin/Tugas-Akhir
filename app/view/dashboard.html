@@ -125,7 +125,7 @@
                 <tbody>
                   {% for device in devices %}
                     <tr>
-                      <td> <a href="http://localhost:5000/v2/{{ device.device_name }}/branch/master">{{ device.device_name }}</a></td>
+                      <td> <a href="http://{{ Address }}:5000/v2/{{ device.device_name }}/branch/master">{{ device.device_name }}</a></td>
                       <td>{{ device.device_ip }}</td>
                       <td>{{ device.device_version }}</td>  
                     </tr>

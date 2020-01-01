@@ -211,8 +211,9 @@ def create():
         for device in devices:
             print("name : "+device.device_name)
             print("address : "+device.device_ip)
-            
-        return render_template('dashboard.html', devices=devices)
+        hostname = socket.gethostname()    
+        IPAddr = socket.gethostbyname(hostname)
+        return render_template('dashboard.html', devices=devices, Address=IPAddr)
 
 @app.route('/v2/<repo>/branch/<branchname>')
 def repo(repo, branchname):
