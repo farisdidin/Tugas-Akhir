@@ -3,6 +3,7 @@ import os
 import shutil
 import sys
 import requests
+import socket
 
 from flask import jsonify, request, Response, redirect, url_for
 from flask import render_template
@@ -219,7 +220,9 @@ def repo(repo, branchname):
     path = device_record.device_repo_path
     rp = ap(path, repo)
     list_of_commits,branches = rp.get_list_commits()
-    return render_template('repo.html', commits=list_of_commits[branchname], reponame=repo, branches=branches, branch=branchname)
+    hostname = socket.gethostname()    
+    IPAddr = socket.gethostbyname(hostname) 
+    return render_template('repo.html', commits=list_of_commits[branchname], reponame=repo, branches=branches, branch=branchname, Address=IPAddr)
 
 @app.route('/v2/show/<repo>/<filename>')
 def show(repo, filename):
