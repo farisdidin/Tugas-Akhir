@@ -72,7 +72,7 @@ class EventHandler(PatternMatchingEventHandler):
         self.file_cache = {}
     #   super(EventHandler, self).__init__()
 
-    def on_any_event(self, event):
+    def on_modified(self, event):
         eventType = ["deleted", "modified"]
         global flag_checkout
     
