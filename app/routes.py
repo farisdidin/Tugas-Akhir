@@ -182,7 +182,7 @@ def directory(repo_name):
     return jsonify(response)
 
 
-@app.route('/v2', methods=['GET', 'POST'])
+@app.route('/v2/home', methods=['GET', 'POST'])
 def create():
     if request.method == 'POST':
         name = request.form.get('name')
