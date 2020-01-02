@@ -69,6 +69,7 @@ class EventHandler(PatternMatchingEventHandler):
         self.repo_name = repo_name
         self.repo_path = repo_path
         self.repository = ar(repo_path,repo_name)
+        self.file_cache = {}
     #   super(EventHandler, self).__init__()
 
     def on_any_event(self, event):
@@ -76,6 +77,11 @@ class EventHandler(PatternMatchingEventHandler):
         global flag_checkout
     
         if event.event_type in eventType:
+            seconds = int(time.time())
+            key = (seconds, event.src_path)
+            if key in self.file_cache:
+                return
+            self.file_cache[key] = True
             pathSplit = event.src_path.split("/")
             if len(pathSplit) > 4:
                 if ".git" not in pathSplit:
