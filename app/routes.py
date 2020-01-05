@@ -19,6 +19,10 @@ from app.src.ApplicationRepo import ApplicationRepo as ap
 from app.src.Observer import ObserverThread as ot
 from app.src.Repository import Repository as local_repo
 
+# Thread receiver
+from app.src.ObserverReceive import ObserverThread as receiver
+from app import var
+
 from app.Models import Device
 
 repo_details = collections.defaultdict(dict)
@@ -28,6 +32,12 @@ OBSERVER = collections.defaultdict(dict)
 devices = Device.query.order_by(Device.device_name).all()
 for device in devices:
     thread = ot(device.device_repo_path,device.device_name)
+    
+    # Thread receiver
+    path_thread_2 = os.path.join(var.PATH_RECEIVE, device.device_name)
+    thread2 = receiver(path_thread_2,device.device_name)
+    thread2.start()
+    
     OBSERVER[device.device_name]['observer']=thread
     thread.start()
 
