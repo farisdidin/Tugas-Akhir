@@ -192,6 +192,10 @@ def directory(repo_name):
     return jsonify(response)
 
 
+@app.route('/v2')
+def home():
+    return redirect(url_for('create'))
+
 @app.route('/v2/home', methods=['GET', 'POST'])
 def create():
     if request.method == 'POST':
