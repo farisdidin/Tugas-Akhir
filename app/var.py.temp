@@ -1,6 +1,7 @@
 TFTP = './config/tftp'
 FTP = './config/ftp'
 PATH = ''
+PATH_RECEIVE = '/home/didin/Project/TA-2/receiver'
 API_TOKEN = 'token '
 URL_GITEA = 'http://faris:faris23!A@localhost:3000/faris/'
 DATABASE = ''
