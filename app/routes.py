@@ -209,6 +209,8 @@ def create():
             db.session.commit()
             OBSERVER[name]['observer'] = ot( device_record.device_repo_path, device_record.device_name)
             OBSERVER[name]['observer'].start()
+            repo_receiver = receiver(os.path.join(var.PATH_RECEIVE,name),name)
+            repo_receiver.start() 
         except Exception as e:
             # print("Unexpected error:", sys.exc_info()[0])
             print("menampilkan"+ str(e))
