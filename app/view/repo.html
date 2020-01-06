@@ -191,10 +191,19 @@
               <h3 class="card-title">Destination</h3>
             </div>
             <div class="card-body">
-              <h4>TFTP</h4>
-              <code>{{ Address }}/{{ reponame }}/[filename]</code>
-              <h4>FTP</h4>
-              <code>{{ Address }}/{{ reponame }}/[filename]</code>
+              <h3>HOST</h3>
+              <code>{{ Address }}</code>
+              <h3>Uploads</h3>
+              <h4>TFTP & FTP</h4>
+              PATH : <code>uploads/{{ reponame }}/[filename]</code>
+              <h4>SCP</h4>
+              PATH : <code>REPO/uploads/{{ reponame }}/[filename]</code>
+              
+              <h3>Downloads</h3>
+              <h4>TFTP & FTP</h4>
+              PATH : <code>downloads/{{ reponame }}/[filename]</code>
+              <h4>SCP</h4>
+              PATH : <code>REPO/downloads/{{ reponame }}/[filename]</code>
 
             </div>
           </div>  
