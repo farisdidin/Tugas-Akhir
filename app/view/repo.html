@@ -136,10 +136,10 @@
           <div class="card">
             <div class="card-header">
               <div class="row">
-                <div class="col-6">
+                <div class="col-4">
                   <h3 class="card-title font-weight-bold">{{ reponame }}</h3>
                 </div>
-                <div class="col-4">
+                <div class="col-4 row">
                   <div class="dropdown">
                       <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                           {{ branch }}
@@ -150,36 +150,68 @@
                             {% endfor %}
                         </div>
                   </div>
+                  <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#exampleModal" ><span class="fa fa-trash " aria-hidden="true"></span></button>
                 </div>
-                <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#exampleModal" ><span class="fa fa-trash " aria-hidden="true"></span></button>
                 
+              </div>
+              <div class="card-tools">
+                <ul class="nav nav-pills ml-auto">
+                  <li class="nav-item">
+                    <a class="nav-link active" href="#commit" data-toggle="tab">Commit</a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="#url" data-toggle="tab">URL</a>
+                  </li>
+                </ul>
               </div>
             </div>
             <!-- /.card-header -->
             <div class="card-body p-0">
-              <table  id='commit_table' class="table table-bordered table-hover">
-                <thead>
-                  <tr>
-                    <th>Commit</th>
-                    <th>Version</th>
-                    <th>Action</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {% for commit in commits %}
-                    <tr>
-                      <td><a href="http://{{ Address }}:3000/faris/{{ reponame }}/commit/{{ commit[0] }}?style=split" target="_blank">{{ commit[0] }}</a></td>
-                      <td>{{ commit[1] }}</td>
-                      {% if commit[2] == 'HEAD' %}
-                          <td> <button disabled="disabled" class="btn btn-danger" > HEAD</button> </td>
-                      {% else %}
-                          <td> <a href="/v2/checkout/{{ reponame }}/{{ commit[0] }}" class="btn btn-primary">Checkout</a> </td>
-                      {% endif %}
-                    </tr>
-                  {% endfor %}
-                  
-                </tbody>
-              </table>
+              <div class="tab-content">
+                <div class="tab-pane active" id="commit">
+                  <table  id='commit_table' class="table table-bordered table-hover">
+                    <thead>
+                      <tr>
+                        <th>Commit</th>
+                        <th>Version</th>
+                        <th>Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% for commit in commits %}
+                        <tr>
+                          <td><a href="http://{{ Address }}:3000/faris/{{ reponame }}/commit/{{ commit[0] }}?style=split" target="_blank">{{ commit[0] }}</a></td>
+                          <td>{{ commit[1] }}</td>
+                          {% if commit[2] == 'HEAD' %}
+                              <td> <button disabled="disabled" class="btn btn-danger" > TERPILIH</button> </td>
+                          {% else %}
+                              <td> <a href="/v2/checkout/{{ reponame }}/{{ commit[0] }}" class="btn btn-primary">PILIH</a> </td>
+                          {% endif %}
+                        </tr>
+                      {% endfor %}
+                      
+                    </tbody>
+                  </table>
+
+                </div>
+                <div class="tab-pane card-body " id="url">
+                    <h3 class="h3">HOST</h3>
+                    <code>{{ Address }}</code>
+                    <h3 class="h3 font-weight-bold">Uploads</h3>
+                    <h4 class="h4">TFTP & FTP</h4>
+                    PATH : <code>uploads/{{ reponame }}/[filename]</code>
+                    <h4 class="h4">SCP</h4>
+                    PATH : <code>REPO/uploads/{{ reponame }}/[filename]</code>
+                    <br>
+                    <h3 class="h3 font-weight-bold">Downloads</h3>
+                    <h4 class="h4">TFTP & FTP</h4>
+                    PATH : <code>downloads/{{ reponame }}/[filename]</code>
+                    <h4 class="h4">SCP</h4>
+                    PATH : <code>REPO/downloads/{{ reponame }}/[filename]</code>
+
+                </div>
+
+              </div>
             </div>
             <!-- /.card-body -->
           </div>
@@ -188,23 +220,12 @@
         <div class="col-md-6">
           <div class="card">
             <div class="card-header">
-              <h3 class="card-title">Destination</h3>
+              <h3 class="card-title">Files</h3>
             </div>
             <div class="card-body">
-              <h3 class="h3">HOST</h3>
-              <code>{{ Address }}</code>
-              <h3 class="h3 font-weight-bold">Uploads</h3>
-              <h4 class="h4">TFTP & FTP</h4>
-              PATH : <code>uploads/{{ reponame }}/[filename]</code>
-              <h4 class="h4">SCP</h4>
-              PATH : <code>REPO/uploads/{{ reponame }}/[filename]</code>
-              <br>
-              <h3 class="h3 font-weight-bold">Downloads</h3>
-              <h4 class="h4">TFTP & FTP</h4>
-              PATH : <code>downloads/{{ reponame }}/[filename]</code>
-              <h4 class="h4">SCP</h4>
-              PATH : <code>REPO/downloads/{{ reponame }}/[filename]</code>
-
+              {% for i in files %}
+                {{ i }}<br>
+              {% endfor %}
             </div>
           </div>  
         </div>

@@ -1,1 +1,23 @@
-ini file yang dikirim untuk test
+ini file yang dikirim untuk testfile kedua number : 1
+file kedua number : 2
+file kedua number : 3
+file kedua number : 4
+file kedua number : 5
+file kedua number : 1
+file kedua number : 2
+file kedua number : 3
+file kedua number : 1
+file kedua number : 2
+file kedua number : 3
+file kedua number : 4
+file kedua number : 5
+file kedua number : 1
+file kedua number : 2
+file kedua number : 3
+file kedua number : 4
+file kedua number : 5
+file kedua number : 1
+file kedua number : 2
+file kedua number : 3
+file kedua number : 4
+file kedua number : 5

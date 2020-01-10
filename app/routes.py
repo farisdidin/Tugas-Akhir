@@ -236,10 +236,11 @@ def repo(repo, branchname):
     device_record = Device.query.filter_by(device_name=repo).first()
     path = device_record.device_repo_path
     rp = ap(path, repo)
+    files = local_repo(repo).get_files()
     list_of_commits,branches = rp.get_list_commits()
     hostname = socket.gethostname()    
     IPAddr = socket.gethostbyname(hostname) 
-    return render_template('repo.html', commits=list_of_commits[branchname], reponame=repo, branches=branches, branch=branchname, Address=IPAddr)
+    return render_template('repo.html', commits=list_of_commits[branchname], reponame=repo, branches=branches, branch=branchname, Address=IPAddr, files=files)
 
 @app.route('/v2/show/<repo>/<filename>')
 def show(repo, filename):
@@ -275,6 +276,12 @@ def delete(repo):
     shutil.rmtree(path)
     print(path)
     return redirect(url_for('create'))
+
+@app.route('/test_list/<reponame>')
+def list_dir(reponame):
+    repo = local_repo(reponame)
+    result = repo.get_files()
+    return jsonify(result)
     
     
 

@@ -21,6 +21,9 @@ class Repository():
         version = repo.get_head()['message']
         return self.path_create, version
 
+    def get_files(self):
+        files = os.listdir(self.path_create)
+        return files
     # def remove(self):
     #     remove_path = self.path_create
     #     # shutil.rmtree(remove_path)
