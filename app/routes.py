@@ -237,10 +237,10 @@ def repo(repo, branchname):
     path = device_record.device_repo_path
     rp = ap(path, repo)
     files = local_repo(repo).get_files()
-    list_of_commits,branches = rp.get_list_commits()
+    list_of_commits,branches,head = rp.get_list_commits()
     hostname = socket.gethostname()    
     IPAddr = socket.gethostbyname(hostname) 
-    return render_template('repo.html', commits=list_of_commits[branchname], reponame=repo, branches=branches, branch=branchname, Address=IPAddr, files=files)
+    return render_template('repo.html', commits=list_of_commits[branchname], reponame=repo, branches=branches, branch=branchname, Address=IPAddr, files=files, head=head)
 
 @app.route('/v2/show/<repo>/<filename>')
 def show(repo, filename):
@@ -252,8 +252,8 @@ def show(repo, filename):
 
     return Response(content, mimetype='text/plain')
 
-@app.route('/v2/checkout/<repo>/<commit>')
-def checkout(repo, commit):
+@app.route('/v2/checkout/<repo>/<branch>/<commit>')
+def checkout(repo,branch, commit):
     observer = OBSERVER[repo]['observer']
     observer.pause_thread()
     device_record = Device.query.filter_by(device_name=repo).first()
@@ -263,7 +263,7 @@ def checkout(repo, commit):
     observer.cont_thread()
     # log = repository.get_log()
     commit = repository.get_list_commits()
-    return redirect(url_for('repo', repo=repo, branchname='master'))
+    return redirect(url_for('repo', repo=repo, branchname=branch))
 
 @app.route('/v2/delete/<repo>')
 def delete(repo):

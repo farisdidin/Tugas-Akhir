@@ -185,7 +185,7 @@
                           {% if commit[2] == 'HEAD' %}
                               <td> <button disabled="disabled" class="btn btn-danger" > TERPILIH</button> </td>
                           {% else %}
-                              <td> <a href="/v2/checkout/{{ reponame }}/{{ commit[0] }}" class="btn btn-primary">PILIH</a> </td>
+                              <td> <a href="/v2/checkout/{{ reponame }}/{{ branch }}/{{ commit[0] }}" class="btn btn-primary">PILIH</a> </td>
                           {% endif %}
                         </tr>
                       {% endfor %}
@@ -223,9 +223,21 @@
               <h3 class="card-title">Files</h3>
             </div>
             <div class="card-body">
-              {% for i in files %}
-                {{ i }}<br>
-              {% endfor %}
+              <table class="table table-bordered table-hover" id="table_files">
+                <thead>
+                  <th>Files</th>
+                  <th>Version</th>
+                </thead>
+                <tbody>
+                  {% for i in files %}
+                    <tr>
+                      <td><a href="{{ url_for('show', repo=reponame, filename=i) }}" target="_blank">{{ i }}</a></td>
+                      <td>{{ head }}</td>
+                    </tr>
+                  {% endfor %}
+                  
+                </tbody>
+              </table>
             </div>
           </div>  
         </div>
@@ -269,6 +281,15 @@
 <script>
   $(function () {
     $('#commit_table').DataTable({
+      "paging": true,
+      "lengthChange": true,
+      "searching": false,
+      "ordering": false,
+      "lengthMenu": [[5, 10, 25, 50, -1], [5, 10, 25, 50, "All"]],
+      "info": true,
+      "autoWidth": false,
+    });
+    $('#table_files').DataTable({
       "paging": true,
       "lengthChange": true,
       "searching": false,

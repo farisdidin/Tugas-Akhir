@@ -23,7 +23,11 @@ class Repository():
 
     def get_files(self):
         files = os.listdir(self.path_create)
-        return files
+        result = []
+        for f in files:
+            if not f.startswith('.'):
+                result.append(f)
+        return result
     # def remove(self):
     #     remove_path = self.path_create
     #     # shutil.rmtree(remove_path)
