@@ -5,8 +5,9 @@ import sys
 import requests
 import socket
 
-from flask import jsonify, request, Response, redirect, url_for
-from flask import render_template
+from flask import jsonify, request, Response, redirect, url_for, render_template, flash 
+from werkzeug.security import generate_password_hash, check_password_hash
+from flask_login import login_user, logout_user, login_required
 # from flask_sqlalchemy import SQLAlchemy
 # from flask_admin import Admin
 
@@ -23,7 +24,7 @@ from app.src.Repository import Repository as local_repo
 from app.src.ObserverReceive import ObserverThread as receiver
 from app import var
 
-from app.Models import Device
+from app.Models import Device, User
 
 repo_details = collections.defaultdict(dict)
 
@@ -57,26 +58,48 @@ print(OBSERVER)
 print(repo_details)
 
 
-@app.route('/login')
+@app.route('/v2/login', methods=['GET', 'POST'])
 def login():
-    return render_template('page_login.html')
+    if request.method == 'GET':
+        return render_template('login.html')
+    elif request.method == 'POST':
+        username = request.form.get('username')
+        password = request.form.get('password')
 
-@app.route('/<test>')
-def begin(test):
-    nano = test
-    print(nano)
-    return render_template('base.html', title=nano)
-    # return "API from configuration management"
+        user = User.query.filter_by(username=username).first()
+        
+        if not user or not check_password_hash(user.password, password): 
+            flash('Please check your login details and try again.')
+            return redirect(url_for('login'))
 
+        login_user(user)
+        return redirect(url_for('create'))
 
-@app.route('/list_all')
-def all_repo():
-    repos = []
-    for i in repo_details:
-        repos.append(i)
+@app.route('/v2/register', methods=['GET', 'POST'])
+def register():
+    if request.method == 'GET':
+        return render_template('register.html')
+    elif request.method == 'POST':
+        username = request.form.get('username')
+        password = request.form.get('password')
 
-    return jsonify(repos)
+        user = User.query.filter_by(username=username).first()
 
+        if user:
+            flash('Username already exist')
+            return redirect(url_for('register'))
+        
+        new_user = User(username=username, password=generate_password_hash(password, method='sha256'))
+        db.session.add(new_user)
+        db.session.commit()
+
+    return redirect(url_for('login'))
+
+@app.route('/v2/logout')
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for('login'))
 
 @app.route('/list/<repo_name>')
 def index(repo_name):
@@ -197,6 +220,7 @@ def home():
     return redirect(url_for('create'))
 
 @app.route('/v2/home', methods=['GET', 'POST'])
+@login_required
 def create():
     if request.method == 'POST':
         name = request.form.get('name')
@@ -232,6 +256,7 @@ def create():
         return render_template('dashboard.html', devices=devices, Address=IPAddr)
 
 @app.route('/v2/<repo>/branch/<branchname>')
+@login_required
 def repo(repo, branchname):
     device_record = Device.query.filter_by(device_name=repo).first()
     path = device_record.device_repo_path
@@ -243,6 +268,7 @@ def repo(repo, branchname):
     return render_template('repo.html', commits=list_of_commits[branchname], reponame=repo, branches=branches, branch=branchname, Address=IPAddr, files=files, head=head)
 
 @app.route('/v2/show/<repo>/<filename>')
+@login_required
 def show(repo, filename):
     device_record = Device.query.filter_by(device_name=repo).first()
     path = device_record.device_repo_path
@@ -253,6 +279,7 @@ def show(repo, filename):
     return Response(content, mimetype='text/plain')
 
 @app.route('/v2/checkout/<repo>/<branch>/<commit>')
+@login_required
 def checkout(repo,branch, commit):
     observer = OBSERVER[repo]['observer']
     observer.pause_thread()
@@ -266,6 +293,7 @@ def checkout(repo,branch, commit):
     return redirect(url_for('repo', repo=repo, branchname=branch))
 
 @app.route('/v2/delete/<repo>')
+@login_required
 def delete(repo):
     device_record = Device.query.filter_by(device_name=repo).first()
     path = device_record.device_repo_path
@@ -280,11 +308,7 @@ def delete(repo):
     print(path)
     return redirect(url_for('create'))
 
-@app.route('/test_list/<reponame>')
-def list_dir(reponame):
-    repo = local_repo(reponame)
-    result = repo.get_files()
-    return jsonify(result)
+
     
     
 
