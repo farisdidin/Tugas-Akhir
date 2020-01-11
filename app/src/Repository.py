@@ -28,7 +28,9 @@ class Repository():
             if not f.startswith('.'):
                 result.append(f)
         return result
-    # def remove(self):
-    #     remove_path = self.path_create
-    #     # shutil.rmtree(remove_path)
-    #     return 'Repo : '+remove_path+' is deleted'
+    
+    def remove(self):
+        # remove_path = self.path_create
+        shutil.rmtree(self.path_create)
+        shutil.rmtree(self.path_create2)
+        return 'Repo : '+self.path_create2+' is deleted'

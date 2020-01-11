@@ -269,11 +269,14 @@ def checkout(repo,branch, commit):
 def delete(repo):
     device_record = Device.query.filter_by(device_name=repo).first()
     path = device_record.device_repo_path
-    repo = ap(path,repo)
-    repo.remove_gitea_repo()
+    repoapp = ap(path,repo)
+    repoapp.remove_gitea_repo()
     db.session.delete(device_record)
     db.session.commit()
-    shutil.rmtree(path)
+    # shutil.rmtree(path)
+    # shutil.rmtree()
+    repos = local_repo(repo)
+    repos.remove()
     print(path)
     return redirect(url_for('create'))
 
