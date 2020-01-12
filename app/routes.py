@@ -7,7 +7,7 @@ import socket
 
 from flask import jsonify, request, Response, redirect, url_for, render_template, flash 
 from werkzeug.security import generate_password_hash, check_password_hash
-from flask_login import login_user, logout_user, login_required
+from flask_login import login_user, logout_user, login_required, current_user
 # from flask_sqlalchemy import SQLAlchemy
 # from flask_admin import Admin
 
@@ -58,48 +58,6 @@ print(OBSERVER)
 print(repo_details)
 
 
-@app.route('/v2/login', methods=['GET', 'POST'])
-def login():
-    if request.method == 'GET':
-        return render_template('login.html')
-    elif request.method == 'POST':
-        username = request.form.get('username')
-        password = request.form.get('password')
-
-        user = User.query.filter_by(username=username).first()
-        
-        if not user or not check_password_hash(user.password, password): 
-            flash('Please check your login details and try again.')
-            return redirect(url_for('login'))
-
-        login_user(user)
-        return redirect(url_for('create'))
-
-@app.route('/v2/register', methods=['GET', 'POST'])
-def register():
-    if request.method == 'GET':
-        return render_template('register.html')
-    elif request.method == 'POST':
-        username = request.form.get('username')
-        password = request.form.get('password')
-
-        user = User.query.filter_by(username=username).first()
-
-        if user:
-            flash('Username already exist')
-            return redirect(url_for('register'))
-        
-        new_user = User(username=username, password=generate_password_hash(password, method='sha256'))
-        db.session.add(new_user)
-        db.session.commit()
-
-    return redirect(url_for('login'))
-
-@app.route('/v2/logout')
-@login_required
-def logout():
-    logout_user()
-    return redirect(url_for('login'))
 
 @app.route('/list/<repo_name>')
 def index(repo_name):
@@ -215,6 +173,49 @@ def directory(repo_name):
     return jsonify(response)
 
 
+@app.route('/v2/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'GET':
+        return render_template('login.html')
+    elif request.method == 'POST':
+        username = request.form.get('username')
+        password = request.form.get('password')
+
+        user = User.query.filter_by(username=username).first()
+        
+        if not user or not check_password_hash(user.password, password): 
+            flash('Please check your login details and try again.')
+            return redirect(url_for('login'))
+
+        login_user(user)
+        return redirect(url_for('create'))
+
+@app.route('/v2/register', methods=['GET', 'POST'])
+def register():
+    if request.method == 'GET':
+        return render_template('register.html')
+    elif request.method == 'POST':
+        username = request.form.get('username')
+        password = request.form.get('password')
+
+        user = User.query.filter_by(username=username).first()
+
+        if user:
+            flash('Username already exist')
+            return redirect(url_for('register'))
+        
+        new_user = User(username=username, password=generate_password_hash(password, method='sha256'))
+        db.session.add(new_user)
+        db.session.commit()
+
+    return redirect(url_for('login'))
+
+@app.route('/v2/logout')
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for('login'))
+
 @app.route('/v2')
 def home():
     return redirect(url_for('create'))
@@ -244,7 +245,7 @@ def create():
             print("menampilkan"+ str(e))
             
         print(name)
-        return redirect(url_for('create'))
+        return redirect(url_for('create', username=current_user.username))
 
     if request.method == 'GET':
         devices = Device.query.order_by(Device.device_name).all()
@@ -253,7 +254,7 @@ def create():
             print("address : "+device.device_ip)
         hostname = socket.gethostname()    
         IPAddr = socket.gethostbyname(hostname)
-        return render_template('dashboard.html', devices=devices, Address=IPAddr)
+        return render_template('dashboard.html', devices=devices, Address=IPAddr, username=current_user.username)
 
 @app.route('/v2/<repo>/branch/<branchname>')
 @login_required
@@ -265,7 +266,7 @@ def repo(repo, branchname):
     list_of_commits,branches,head = rp.get_list_commits()
     hostname = socket.gethostname()    
     IPAddr = socket.gethostbyname(hostname) 
-    return render_template('repo.html', commits=list_of_commits[branchname], reponame=repo, branches=branches, branch=branchname, Address=IPAddr, files=files, head=head)
+    return render_template('repo.html', commits=list_of_commits[branchname], reponame=repo, branches=branches, branch=branchname, Address=IPAddr, files=files, head=head, username=current_user.username)
 
 @app.route('/v2/show/<repo>/<filename>')
 @login_required
@@ -290,7 +291,7 @@ def checkout(repo,branch, commit):
     observer.cont_thread()
     # log = repository.get_log()
     commit = repository.get_list_commits()
-    return redirect(url_for('repo', repo=repo, branchname=branch))
+    return redirect(url_for('repo', repo=repo, branchname=branch, username=current_user.username))
 
 @app.route('/v2/delete/<repo>')
 @login_required
@@ -306,8 +307,16 @@ def delete(repo):
     repos = local_repo(repo)
     repos.remove()
     print(path)
-    return redirect(url_for('create'))
+    return redirect(url_for('create',username=current_user.username))
 
+
+@app.route('/view')
+def view():
+    return render_template('dashboard.html')
+
+@app.route('/viewrepo')
+def viewrepo():
+    return render_template('repo2.html')
 
     
     

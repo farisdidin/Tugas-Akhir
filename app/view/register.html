@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "base-login.html" %}
 {% block body %}
 <body class="hold-transition login-page">
 <div class="login-box">
@@ -49,7 +49,7 @@
 
      
       <p class="mb-0">
-        <a href="login.html" class="text-center">Already have account</a>
+        <a href="{{ url_for('login') }}" class="text-center">Already have account</a>
       </p>
     </div>
     <!-- /.login-card-body -->
