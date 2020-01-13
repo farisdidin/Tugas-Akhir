@@ -95,7 +95,7 @@ class EventHandler(PatternMatchingEventHandler):
                     source = os.path.join(self.repo_path, pathSplit[-1])
                     dest = os.path.join(var.PATH,self.repo_name)
                     dest = os.path.join(dest,pathSplit[-1])
-                    copyfile(source,dest)
+                    move(source,dest)
                     
 
 
