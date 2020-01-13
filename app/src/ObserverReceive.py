@@ -9,7 +9,7 @@ from watchdog.events import FileSystemEventHandler
 from watchdog.events import PatternMatchingEventHandler
 
 from git import Repo, Git
-from shutil import copyfile
+from shutil import copyfile, move
 
 from app.src.ApplicationRepo import ApplicationRepo as ar
 from app.Models import Device
