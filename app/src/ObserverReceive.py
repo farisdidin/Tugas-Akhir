@@ -76,7 +76,7 @@ class EventHandler(PatternMatchingEventHandler):
     #   super(EventHandler, self).__init__()
 
     def on_modified(self, event):
-        eventType = ["deleted", "modified"]
+        eventType = ["modified"]
         global flag_checkout
     
         if event.event_type in eventType:
@@ -95,8 +95,8 @@ class EventHandler(PatternMatchingEventHandler):
                     source = os.path.join(self.repo_path, pathSplit[-1])
                     dest = os.path.join(var.PATH,self.repo_name)
                     dest = os.path.join(dest,pathSplit[-1])
-                    move(source,dest)
-                    
+                    copyfile(source,dest)
+                    os.remove(source)
 
 
                     # self.update_branch()
