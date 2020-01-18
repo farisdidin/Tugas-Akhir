@@ -133,7 +133,7 @@ class ApplicationRepo():
                 else:
                     result[i].append([short_sha, message])
 
-                print(short_sha)
+                # print(short_sha)
                 array_commits.append(short_sha+ ' ' +message)
             # result[i]=array_commits
 

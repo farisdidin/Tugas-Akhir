@@ -1,6 +1,7 @@
 from paramiko import SSHClient
 from scp import SCPClient
 import sys, time
+import fileinput
 
 argument = sys.argv
 
@@ -11,17 +12,15 @@ ssh.connect('10.199.16.68', username='didin', password='Tadidin23!')
 #SCPCLient takes a paramiko transport as an argument
 scp = SCPClient(ssh.get_transport())
 
-# scp.put('test.txt', 'test2.txt')
-# scp.get('test2.txt')
 
-# Uploading the 'test' directory with its content in the
-# '/home/user/dump' remote directory
-for i in range(int(argument[2])):
-    f = open(argument[1], "a+")
-    f.write('file kedua number : '+str(i+1)+'\n')
-    f.close()
-    scp.put(argument[1], recursive=True, remote_path='/home/didin/repo-local/test_1')
+for i in range(int(argument[2]), int(argument[3])):
+    with fileinput.FileInput(argument[1], inplace=True,) as file:
+        for line in file:
+            print(line.replace('ip address 10.199.4.'+str(i), 'ip address 10.199.4.'+str(i+1)), end='')
+
+    scp.put(argument[1], recursive=True, remote_path='REPO/downloads/test_1/config')
     time.sleep(1)
+    print(i)
     
 
 scp.close()
