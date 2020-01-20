@@ -18,7 +18,7 @@ for i in range(int(argument[2]), int(argument[3])):
         for line in file:
             print(line.replace('ip address 10.199.4.'+str(i), 'ip address 10.199.4.'+str(i+1)), end='')
 
-    scp.put(argument[1], recursive=True, remote_path='REPO/downloads/test_1/config')
+    scp.put(argument[1], recursive=True, remote_path='/home/didin/REPO/uploads/test_response2/test')
     time.sleep(1)
     print(i)
     
