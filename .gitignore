@@ -9,8 +9,11 @@ date.py
 test-git.py
 app/var.py
 testing/
-example.desktop
+examples.desktop
 app_ori.py 
-commnand.py
+command.py
 *.png
 *.pdf
+test-watchdog.py
+watch.sh
+middleware.py
