@@ -16,4 +16,3 @@ command.py
 *.pdf
 test-watchdog.py
 watch.sh
-middleware.py

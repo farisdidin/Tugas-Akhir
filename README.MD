@@ -13,9 +13,10 @@
 8. SFTP 
    
 ### PENGATURAN FLASK
-1. Install python flask menggunakan command ``` pip3 install Flask```.
+1. Install python flask menggunakan command ``` apt install python3-flask```.
 2. Install library yang dibutuhkan
    1. python requests ```pip3 install requests``` 
    2. gitpython ```pip3 install gitpython```
    3. watchdog ```pip3 install watchdog```
    4. flask_login ```pip3 install flask_login```
+3. Clone source code aplikasi dari https://github.com/farisdidin/Tugas-Akhir.git dengan command ```git clone -b v2.0 https://github.com/farisdidin/Tugas-Akhir.git```
